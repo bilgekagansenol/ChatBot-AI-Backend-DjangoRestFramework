@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'user_api',
+    'promptbox_api',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
