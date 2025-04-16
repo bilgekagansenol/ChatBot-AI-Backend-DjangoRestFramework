@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING: keep the secret key usedd in production secret!
 SECRET_KEY = 'django-insecure-yw2eh==ao%le7trouwgp#v#^x+n9!y%^vngbmye0xj0d=s)%ly'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'user_api',
     'promptbox_api',
-    'django_extensions'
+    'django_extensions',
+    'chatbot_api'
 ]
 
 MIDDLEWARE = [
