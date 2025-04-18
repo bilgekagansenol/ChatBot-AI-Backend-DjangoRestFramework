@@ -15,7 +15,7 @@ class PromptBoxItemSerializer(serializers.ModelSerializer):
    
     class Meta:
         model = PromptBoxItem
-        fields = ['id','PromptBoxItem_information','dialogue']
+        fields = ['id','PromptBoxItem_information','dialogue', 'is_favourite']
 
 
     def validate(self, data):
@@ -39,6 +39,10 @@ class PromptBoxItemSerializer(serializers.ModelSerializer):
         instance.PromptBoxItem_information = validated_data.get(
             'PromptBoxItem_information',
             instance.PromptBoxItem_information
+        )
+        instance.is_favourite = validated_data.get(
+            'is_favourite',
+            instance.is_favourite
         )
          # when updating no allow to change dialogues just information cause of  we just change info.
  

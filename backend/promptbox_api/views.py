@@ -1,4 +1,5 @@
 from rest_framework import viewsets , permissions
+from rest_framework import filters
 
 from promptbox_api.models import PromptBoxItem
 
@@ -9,6 +10,8 @@ from promptbox_api.serializers import PromptBoxItemSerializer
 class PromptBoxItemViewSet(viewsets.ModelViewSet):
     """viewset for creating , listing and managing promptbox items"""
     serializer_class = PromptBoxItemSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['PromptBoxItem_information']
     queryset = PromptBoxItem.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     
