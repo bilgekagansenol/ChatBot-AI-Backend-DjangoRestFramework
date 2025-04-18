@@ -24,3 +24,4 @@ class PromptBoxItemViewSet(viewsets.ModelViewSet):
         """add  user automatically when creating new item"""
         serializer.save(user=self.request.user)
         
+##try
