@@ -31,7 +31,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = models.UserProfile
-        fields = ('id' , 'name', 'password')
+        fields = ('id' ,'email' ,  'name', 'password')
         extra_kwargs={
             'password':{
                 'write_only': True,
@@ -63,5 +63,4 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         return value
     
 
-    
     

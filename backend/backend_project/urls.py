@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import path,include
 from rest_framework.routers import DefaultRouter
 
-from user_api.views import UserProfileViewSet , UserLoginApiView , ChangePasswordView , PasswordResetRequestView , PasswordResetConfirmView
+from user_api.views import UserProfileViewSet , UserLoginApiView , ChangePasswordView , PasswordResetRequestView , PasswordResetConfirmView 
 from promptbox_api.views import PromptBoxItemViewSet
 from chatbot_api import urls
 from dashboard_api import urls

@@ -10,8 +10,7 @@ from rest_framework import status
 
 from user_api import serializers
 from user_api import models
-from user_api.serializers import ChangePasswordSerailizer , PasswordResetRequestSerializer
-
+from user_api.serializers import ChangePasswordSerailizer , PasswordResetRequestSerializer , UserProfileSerializer
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
@@ -112,3 +111,5 @@ class PasswordResetConfirmView(APIView):
         user.save()
 
         return Response({"message": "Password has been reset successfully."}, status=status.HTTP_200_OK)
+
+
