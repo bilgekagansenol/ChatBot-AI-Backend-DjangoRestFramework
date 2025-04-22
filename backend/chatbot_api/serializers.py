@@ -22,3 +22,8 @@ class SessionSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['created_on', 'last_uploaded']
     
+class UpdateSessionTitleSerializer(serializers.ModelSerializer):
+    """serializer for session title update"""
+    class Meta:
+        model = ChatSession
+        fields = ['title']

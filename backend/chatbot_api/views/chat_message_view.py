@@ -6,8 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status , permissions
 
 from chatbot_api.models import ChatMessage ,ChatSession
-from chatbot_api.serializers import ChatMessageSerializer
-
+from chatbot_api.serializers import ChatMessageSerializer , UpdateSessionTitleSerializer
 
 
 class ChatMessageAPIView(APIView):
@@ -38,6 +37,29 @@ class ChatMessageAPIView(APIView):
             message = message_text
         )
 
+          #AI ile otomatik başlık üretme (ilk mesajsa + title boşsa)
+        is_first_message = not ChatMessage.objects.filter(session=session).exclude(id=user_msg.id).exists()
+        if is_first_message and not session.title:
+            try:
+                title_prompt = [
+                    {"role": "user", "content": f"Mesajdan maksimum 4 kelimelik bir başlık üret. Noktalama işareti kullanma. Başlık sade ve öz olmalı:\n\n{message_text}"
+}
+                ]
+                title_payload = {
+                    "model": "llama3.2:1b",
+                    "messages": title_prompt,
+                    "stream": False
+                }
+                title_response = requests.post("https://5f81-213-74-176-214.ngrok-free.app/api/chat", json=title_payload, timeout=10)
+                title_response.raise_for_status()
+                ai_title = title_response.json().get("message", {}).get("content", "Yeni Oturum").strip()
+                session.title = ai_title
+                session.save()
+            except Exception as e:
+                print("AI başlık üretim hatası:", e)
+                session.title = "Yeni Oturum"
+                session.save()
+
         # collect old messages 
 
         past_messages = session.messages.order_by("timestamp")
@@ -49,7 +71,7 @@ class ChatMessageAPIView(APIView):
         ]
 
         #  request to ollama
-        ollama_url = "https://346d-213-74-176-214.ngrok-free.app/api/chat"# Ollama URL
+        ollama_url = "https://5f81-213-74-176-214.ngrok-free.app/api/chat"# Ollama URL
         payload = {
             "model": "llama3.2:1b",  # model name
             "messages": formatted_history,
@@ -154,3 +176,19 @@ class UpdateFavouriteAPIView(APIView):
         session.is_favourite = is_fav
         session.save()
         return Response({'message':'Session favourite status  updated','is_favourite':session.is_favourite})
+
+
+class UpdateSessionTitleAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch (self , request , session_id):
+        try:
+            session = ChatSession.objects.get(id= session_id ,user = request.user)
+        except ChatSession.DoesNotExist:
+            return Response({'error':'session not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = UpdateSessionTitleSerializer(session , data=request.data , partial= True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors , status=status.HTTP_400_BAD_REQUEST)

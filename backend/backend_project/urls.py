@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from user_api.views import UserProfileViewSet , UserLoginApiView , ChangePasswordView , PasswordResetRequestView , PasswordResetConfirmView
 from promptbox_api.views import PromptBoxItemViewSet
 from chatbot_api import urls
-
+from dashboard_api import urls
 
 router = DefaultRouter()
 router.register('user', UserProfileViewSet, basename='user')
@@ -22,5 +22,6 @@ urlpatterns = [
     path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('api/reset-password/', PasswordResetRequestView.as_view(), name='reset-password'),
     path('api/reset-password-confirm/', PasswordResetConfirmView.as_view(), name='reset-password-confirm'),
-    path('api/', include('chatbot_api.urls'))
+    path('api/', include('chatbot_api.urls')),
+    path('dashboard/', include('dashboard_api.urls'))
 ]

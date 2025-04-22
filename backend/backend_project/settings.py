@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'user_api',
     'promptbox_api',
     'django_extensions',
-    'chatbot_api'
+    'chatbot_api',
+    'dashboard_api'
 ]
 
 MIDDLEWARE = [
