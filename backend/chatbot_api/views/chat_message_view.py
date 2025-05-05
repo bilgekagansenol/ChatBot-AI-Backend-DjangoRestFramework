@@ -50,7 +50,7 @@ class ChatMessageAPIView(APIView):
                     "messages": title_prompt,
                     "stream": False
                 }
-                title_response = requests.post("https://0db1-213-74-176-214.ngrok-free.app/api/chat", json=title_payload, timeout=10)
+                title_response = requests.post("https://5958-176-41-36-22.ngrok-free.app/api/chat", json=title_payload, timeout=10)
                 title_response.raise_for_status()
                 ai_title = title_response.json().get("message", {}).get("content", "Yeni Oturum").strip()
                 session.title = ai_title
@@ -63,15 +63,27 @@ class ChatMessageAPIView(APIView):
         # collect old messages 
 
         past_messages = session.messages.order_by("timestamp")
+        from rag_engine.retriever import get_rag_response  # retriever dosyana göre
+
+        # 1. RAG'den kişiye özel bilgi çek
+        rag_info = get_rag_response(message_text)
+
+        # 2. Eğer bilgi geldiyse, system mesajına ekle
         formatted_history = [
             {
-                "role":"user" if msg.is_user else "assistant",
-                "content":msg.message
+                "role": "user" if msg.is_user else "assistant",
+                "content": msg.message
             } for msg in past_messages
         ]
 
+        if rag_info:
+            formatted_history.insert(0, {
+                "role": "system",
+                "content": f"information about person: {rag_info}"
+            })
+
         #  request to ollama
-        ollama_url = "https://0db1-213-74-176-214.ngrok-free.app/api/chat"# Ollama URL
+        ollama_url = "https://5958-176-41-36-22.ngrok-free.app/api/chat"# Ollama URL
         payload = {
             "model": "llama3.2:1b",  # model name
             "messages": formatted_history,
