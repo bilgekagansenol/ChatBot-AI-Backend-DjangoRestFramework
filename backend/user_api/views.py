@@ -16,6 +16,7 @@ from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from user_api import permissions
 
@@ -113,3 +114,19 @@ class PasswordResetConfirmView(APIView):
         return Response({"message": "Password has been reset successfully."}, status=status.HTTP_200_OK)
 
 
+class UploadProfilePictureView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser,FormParser]
+
+    def patch(self , request):
+        user = request.user
+        profile_picture = request.FILES.get('profile_picture')
+        
+        if not profile_picture:
+            return Response({"error":"No file provided."},status=status.HTTP_400_BAD_REQUEST)
+
+        user.profile_picture = profile_picture
+        user.save()
+
+        return Response({"message":"Profile picture updated.","profile_picture":user.profile_picture.url},status=status.HTTP_200_OK)
+    

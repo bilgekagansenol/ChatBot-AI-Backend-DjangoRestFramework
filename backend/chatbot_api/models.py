@@ -52,5 +52,6 @@ class ChatMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     token_usage = models.IntegerField(null=True , blank=True)#don't show it to user
     response_time = models.FloatField(null=True , blank= True)
-
+    chart_image = models.ImageField(upload_to='chat_charts/', null=True , blank=True)
+    
 

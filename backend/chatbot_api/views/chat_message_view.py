@@ -50,7 +50,7 @@ class ChatMessageAPIView(APIView):
                     "messages": title_prompt,
                     "stream": False
                 }
-                title_response = requests.post("https://5f81-213-74-176-214.ngrok-free.app/api/chat", json=title_payload, timeout=10)
+                title_response = requests.post("https://0db1-213-74-176-214.ngrok-free.app/api/chat", json=title_payload, timeout=10)
                 title_response.raise_for_status()
                 ai_title = title_response.json().get("message", {}).get("content", "Yeni Oturum").strip()
                 session.title = ai_title
@@ -71,7 +71,7 @@ class ChatMessageAPIView(APIView):
         ]
 
         #  request to ollama
-        ollama_url = "https://5f81-213-74-176-214.ngrok-free.app/api/chat"# Ollama URL
+        ollama_url = "https://0db1-213-74-176-214.ngrok-free.app/api/chat"# Ollama URL
         payload = {
             "model": "llama3.2:1b",  # model name
             "messages": formatted_history,
@@ -102,11 +102,58 @@ class ChatMessageAPIView(APIView):
             model_name = "llama3.2:1b",
             token_usage=token_usage
         )
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        import os
+        from django.core.files import File
+        from django.conf import settings
 
+        # Excel dosyasından pie chart üretimi (varsa)
+        excel_file = request.FILES.get("file")
+        if excel_file:
+            try:
+                df = pd.read_excel(excel_file)
+
+                # Otomatik kategori ve değer sütunlarını belirle
+                columns = df.columns.tolist()
+                label_col = None
+                value_col = None
+
+                for col in columns:
+                    if 'kategori' in col.lower() or 'sınıf' in col.lower() or 'isim' in col.lower():
+                        label_col = col
+                    elif df[col].dtype in ['int64', 'float64']:
+                        value_col = col
+
+                # Eğer kategori belli değilse ilk sütunu al
+                if not label_col:
+                    label_col = columns[0]
+
+                # Grafik çizimi
+                plt.figure(figsize=(4, 4))
+                if value_col:
+                    df.groupby(label_col)[value_col].sum().plot.pie(autopct="%1.1f%%")
+                else:
+                    df[label_col].value_counts().plot.pie(autopct="%1.1f%%")
+
+                plt.title(f"{label_col} Dağılımı")
+                plt.ylabel("")
+                plt.tight_layout()
+
+                chart_filename = f"chart_{bot_msg.id}.png"
+                chart_path = os.path.join(settings.MEDIA_ROOT, "chat_charts", chart_filename)
+                os.makedirs(os.path.dirname(chart_path), exist_ok=True)
+                plt.savefig(chart_path)
+                plt.close()
+
+                with open(chart_path, "rb") as f:
+                    bot_msg.chart_image.save(chart_filename, File(f), save=True)
+            except Exception as e:
+                print("Excel işleme hatası:", e)
         # 6. JSON response
         return Response({
-            "user_message": ChatMessageSerializer(user_msg).data,
-            "bot_reply": ChatMessageSerializer(bot_msg).data
+            "user_message": ChatMessageSerializer(user_msg,context={"request": request}).data,
+            "bot_reply": ChatMessageSerializer(bot_msg,context={"request": request}).data
         }, status=status.HTTP_201_CREATED)
 
 

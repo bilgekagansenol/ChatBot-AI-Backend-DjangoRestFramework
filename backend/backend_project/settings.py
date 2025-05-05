@@ -144,3 +144,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'blgkgnsnl@gmail.com'
 EMAIL_HOST_PASSWORD = 'taxy eken dgcd bptp'  # Gerçek Gmail şifren değil!
+
+import os
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
